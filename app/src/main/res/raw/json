@@ -1,0 +1,45 @@
+{
+  "retSn": "bc57a69b67ec470d959a4074fb388860",
+  "qryapwd": {
+    "retCd": "0",
+    "psws": {
+      "a8:57:4e:2e:85:9e": {
+        "bssid": "a8:57:4e:2e:85:9e",
+        "pwd": "C3D3A398B305166BE029310699585D42B930FF192E285063F1A8B7A81CBD61A9",
+        "hid": "919D46507634A0F1796DA0807370DEC5",
+        "xJs": "",
+        "ssid": "Don't touch me",
+        "xUser": "",
+        "type": "internet",
+        "xPwd": "",
+        "securityLevel": "2"
+      },
+      "00:36:76:5d:b0:71": {
+        "bssid": "00:36:76:5d:b0:71",
+        "pwd": "7C25E9D58BD1021EE975130B9EFA7BF5F88C909AD52B88C27F761B953CB6384A",
+        "hid": "F0012FA0C000690851825892C30CC16E",
+        "xJs": "",
+        "ssid": "360免费WiFi-71",
+        "xUser": "",
+        "type": "redirect",
+        "xPwd": "",
+        "securityLevel": "2"
+      }
+    },
+    "topn": {
+      "fc:d7:33:00:fa:c8TP-LINK_FAC8": 16,
+      "96:0c:6d:59:52:804201": 0,
+      "00:36:76:5d:b0:71360免费WiFi-71": 0,
+      "14:82:5b:c0:14:58USER_c01459": 0,
+      "80:89:17:7b:fd:c2TP-LINK_FDC2": 0,
+      "a8:57:4e:2e:85:9eDon't touch me": 184
+    },
+    "qid": "bc57a69b-67ec-470d-959a-4074fb388860",
+    "sysTime": "1463203972230"
+  },
+  "retCd": "0",
+  "commonswitch": {
+    "retCd": "0",
+    "switchFlag": "false"
+  }
+}
