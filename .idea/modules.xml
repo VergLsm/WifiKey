@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WifiKey.iml" filepath="$PROJECT_DIR$/WifiKey.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/verglib/verglib.iml" filepath="$PROJECT_DIR$/verglib/verglib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../VergAndroidLib/verglib/verglib.iml" filepath="$PROJECT_DIR$/../VergAndroidLib/verglib/verglib.iml" />
     </modules>
   </component>
 </project>

@@ -1,1 +1,3 @@
-include ':app', ':verglib'
+include ':app'
+include 'verglib'
+project(':verglib').projectDir = new File(settingsDir, '../VergAndroidLib/verglib')

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -36,7 +37,7 @@ import java.util.Map;
 import verg.lib.VolleyRequestQueue;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends AppCompatActivity implements Response.Listener<String> {
+public class MainActivity extends AppCompatActivity implements Response.Listener<String>,ApListAdapter.MyItemLongClickListener, ApListAdapter.MyItemClickListener {
 
     private String TAG = "MainActivity";
 
@@ -60,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
         this.wbr = new WifiBroadcastReceiver();
 
         this.mApListAdapter = ApListAdapter_.getInstance_(this);
-
+        mApListAdapter.setOnItemClickListener(this);
+        mApListAdapter.setOnItemLongClickListener(this);
         // use a linear layout manager
         apList.setLayoutManager(new LinearLayoutManager(this));
         apList.setAdapter(mApListAdapter);
@@ -161,6 +163,18 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
                         MainActivity.super.onBackPressed();
                     }
                 }).show();
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+        final APEntity item = mApListAdapter.getItem(position);
+        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        final APEntity item = mApListAdapter.getItem(position);
+        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
     }
 
     class WifiBroadcastReceiver extends BroadcastReceiver {

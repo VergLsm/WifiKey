@@ -29,6 +29,10 @@ public class APEntity implements Comparable<APEntity> {
         return isOpen;
     }
 
+    public boolean isWPS() {
+        return WifiUtils.isWPS(scanResult);
+    }
+
     public boolean isHasKey() {
         return mPWD != null;
     }

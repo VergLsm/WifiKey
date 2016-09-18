@@ -2,6 +2,7 @@ package verg.wifikey;
 
 import android.graphics.Typeface;
 import android.net.wifi.ScanResult;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
     private ArrayList<APEntity> mApEntityList;
     private java.lang.String TAG = this.getClass().getSimpleName();
     private HashMap<String, Map<String, String>> mKeyMap;
+    private MyItemClickListener mItemClickListener;
+    private MyItemLongClickListener mItemLongClickListener;
 
     public ApListAdapter() {
         mApEntityList = new ArrayList<>();
@@ -109,7 +112,7 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
         return apMap;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
 
         final TextView tvPWD;
 
@@ -118,9 +121,18 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
         final TextView tvCap;
 
         final ImageView ivSignalLevel;
+        private MyItemClickListener mItemClickListener;
+        private MyItemLongClickListener mItemLongClickListener;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, MyItemClickListener itemClickListener, MyItemLongClickListener itemLongClickListener) {
             super(itemView);
+            mItemClickListener = itemClickListener;
+            mItemLongClickListener = itemLongClickListener;
+
+            CardView cardView = (CardView) itemView.findViewById(R.id.card_view);
+            cardView.setOnClickListener(this);
+            cardView.setOnLongClickListener(this);
+
             ivSignalLevel = (ImageView) itemView.findViewById(R.id.ivSignalLevel);
             tvSSID = (TextView) itemView.findViewById(R.id.ssid_text);
             tvCap = (TextView) itemView.findViewById(R.id.tvCap);
@@ -138,7 +150,14 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
 
             if (apEntity.isOnline()) {
                 ivSignalLevel.setImageLevel(Math.abs(apEntity.getSignalLevel()));
-                tvCap.setText(apEntity.getBSSID() + " " + String.valueOf(apEntity.getSignalLevel()));
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(apEntity.getBSSID());
+//                stringBuilder.append(" ");
+//                stringBuilder.append(apEntity.getSignalLevel());
+                if (apEntity.isWPS()){
+                    stringBuilder.append(" WPS");
+                }
+                tvCap.setText(stringBuilder.toString());
                 if (apEntity.isOpen()) {
                     ivSignalLevel.setImageResource(R.drawable.wifi_sel);
                 } else {
@@ -157,6 +176,21 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
             }
 
         }
+
+        @Override
+        public void onClick(View v) {
+            if(mItemClickListener != null){
+                mItemClickListener.onItemClick(v,getAdapterPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if(mItemLongClickListener != null){
+                mItemLongClickListener.onItemLongClick(v, getAdapterPosition());
+            }
+            return true;
+        }
     }
 
     @Override
@@ -164,7 +198,7 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cardview, parent, false);
 
-        return new ViewHolder(v);
+        return new ViewHolder(v,mItemClickListener,mItemLongClickListener);
     }
 
     @Override
@@ -177,4 +211,27 @@ public class ApListAdapter extends RecyclerView.Adapter<ApListAdapter.ViewHolder
         return mApEntityList.size();
     }
 
+    public APEntity getItem(int position){
+        return mApEntityList.get(position);
+    }
+
+    public interface MyItemClickListener {
+        void onItemClick(View view, int postion);
+    }
+
+    public interface MyItemLongClickListener {
+        void onItemLongClick(View view, int postion);
+    }
+
+    /**
+     * 设置Item点击监听
+     * @param listener
+     */
+    public void setOnItemClickListener(MyItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
+
+    public void setOnItemLongClickListener(MyItemLongClickListener listener){
+        this.mItemLongClickListener = listener;
+    }
 }
