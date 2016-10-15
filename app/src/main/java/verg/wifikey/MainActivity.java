@@ -2,13 +2,16 @@ package verg.wifikey;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +40,7 @@ import java.util.Map;
 import verg.lib.VolleyRequestQueue;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends AppCompatActivity implements Response.Listener<String>,ApListAdapter.MyItemLongClickListener, ApListAdapter.MyItemClickListener {
+public class MainActivity extends AppCompatActivity implements Response.Listener<String>, ApListAdapter.MyItemLongClickListener, ApListAdapter.MyItemClickListener {
 
     private String TAG = "MainActivity";
 
@@ -168,13 +171,45 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
     @Override
     public void onItemLongClick(View view, int position) {
         final APEntity item = mApListAdapter.getItem(position);
-        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
+        if (item.isHasKey()) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Confirm?")
+                    .setMessage("Connect to " + item.getSSID() + "?")
+                    .setNegativeButton("cancel", null)
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            WifiConfiguration config = new WifiConfiguration();
+                            config.BSSID = item.getBSSID();
+                            config.SSID = "\"" + item.getSSID() + "\"";
+                            config.hiddenSSID = false;
+                            config.status = WifiConfiguration.Status.ENABLED;
+                            String cap = item.getCapabilities();
+                            if(cap.contains("WPA")){
+                                if (cap.contains("PSK")){
+                                    config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                                }else if (cap.contains("EAP")){
+                                    config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+                                }
+                                config.preSharedKey = "\"" + item.getPWD() + "\"";
+                            }else if(cap.contains("WEP")){
+                                config.wepKeys[0] ="\"" + item.getPWD() + "\""; //This is the WEP Password
+                                config.wepTxKeyIndex = 0;
+                            }
+                            int netID = wm.addNetwork(config);
+                            boolean bRet = wm.enableNetwork(netID, true);
+                        }
+                    })
+                    .create()
+                    .show();
+        }
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        final APEntity item = mApListAdapter.getItem(position);
-        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
+//        final APEntity item = mApListAdapter.getItem(position);
+//        Toast.makeText(this,item.getSSID(),Toast.LENGTH_SHORT).show();
     }
 
     class WifiBroadcastReceiver extends BroadcastReceiver {
@@ -219,13 +254,13 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
         try {
             JSONObject jsonObject = new JSONObject(response);
             String retCd = jsonObject.optString("retCd");
-            if (retCd != null){
-                if (retCd.equals("0")){
+            if (retCd != null) {
+                if (retCd.equals("0")) {
                     //init
                     JSONObject qryapwd = jsonObject.optJSONObject("qryapwd");
                     if (qryapwd != null) {
                         mWifiMasterKey.setSalt(jsonObject.getString("retSn"));
-                        if (qryapwd.optString("retCd").equals("0")){
+                        if (qryapwd.optString("retCd").equals("0")) {
                             //{"retSn":"6d64e0ade80f45f187bac05925904367",
                             // "qryapwd":{  "retCd":"0",
                             //              "psws":{"a4:56:02:cb:07:22":{"bssid":"a4:56:02:cb:07:22","pwd":"3EDD2758F1B4AF0511825F61E8A856DC9B31DF981425BE590354A24DEA8B9EC6","hid":"B845611ECFEF0865B15FE8151610F061","xJs":"","ssid":"禅信律师","xUser":"","type":"internet","xPwd":"","securityLevel":"2"}},
@@ -236,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
                             // "commonswitch":{"retCd":"0","switchFlag":"false"}}
 //                            mWifiMasterKey.setSalt(jsonObject.getString("retSn"));
                             parsingResponse(jsonObject);
-                        }else if (qryapwd.optString("retCd").equals("-9998")){
+                        } else if (qryapwd.optString("retCd").equals("-9998")) {
                             //{"retSn":"a99306b638ec4f4ba115a6dcc5665287",
                             // "qryapwd":{  "retCd":"-9998",
                             //              "retMsg":"亲，不能这样，太频繁啦！歇会，歇会。",
@@ -247,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
 //                            mWifiMasterKey.setSalt(jsonObject.optString("retSn"));
                             Snackbar.make(mFab, jsonObject.optJSONObject("qryapwd").optString("retMsg"), Snackbar.LENGTH_SHORT).show();
                         }
-                    }else{
+                    } else {
                         //{"initdev":{"retCd":"0","dhid":"a9ab25997d794da99e0311b11cdec364"},
                         // "retCd":"0",
                         // "commonswitch":{"retCd":"0","switchFlag":"true"}}
@@ -259,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
                             }
                         }
                     }
-                }else if(retCd.equals("-1111")){
+                } else if (retCd.equals("-1111")) {
                     //{"retCd":"-1111",
                     // "retMsg":"商户数字签名错误，请联系请求发起方！",
                     // "retSn":"02f414f42b3c408fb9ec5bb352609420"}

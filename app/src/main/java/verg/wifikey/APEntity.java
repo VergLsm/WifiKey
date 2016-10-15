@@ -65,6 +65,10 @@ public class APEntity implements Comparable<APEntity> {
         this.mPWD = pwd;
     }
 
+    String getCapabilities(){
+        return scanResult.capabilities;
+    }
+
     @Override
     public int compareTo(@NonNull APEntity another) {
         return another.getSignalLevel() - getSignalLevel();
