@@ -32,7 +32,7 @@ import verg.lib.TextUtils;
  * WifiMasterKey
  * Created by verg on 16-5-13.
  */
-public class WifiMasterKey {
+class WifiMasterKey {
     private String ii;
     private String mac;
     private String dhid;
@@ -40,8 +40,12 @@ public class WifiMasterKey {
     private String TAG = this.getClass().getSimpleName();
     private boolean isSigned = false;
 
-    public WifiMasterKey() {
+    WifiMasterKey() {
 
+    }
+
+    void setSigned(boolean signed) {
+        isSigned = signed;
     }
 
     private static String sign(LinkedHashMap<String, String> data, String salt) {
@@ -63,7 +67,7 @@ public class WifiMasterKey {
         return getMD5(request_str.toString()).toUpperCase();
     }
 
-    public static String decrypt(String ciphertext) {
+    private static String decrypt(String ciphertext) {
         String aesKey = "k%7Ve#8Ie!5Fb&8E";
         String aesIV = "y!0Oe#2Wj#6Pw!3V";
 
@@ -76,25 +80,13 @@ public class WifiMasterKey {
             String temp = new String(decrypted).trim();
             temp = URLDecoder.decode(temp, "utf-8");
             return temp.substring(3, temp.length() - 13);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException | InvalidKeyException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public StringRequest getQuestRequest(Map<String, String> apMap, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    StringRequest getQuestRequest(Map<String, String> apMap, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         final LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("appid", "0008");
         data.put("bssid", apMap.get("bssid"));
@@ -116,7 +108,7 @@ public class WifiMasterKey {
         return new KeyRequest(data, listener, errorListener);
     }
 
-    public StringRequest getSignRequest(Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    StringRequest getSignRequest(Response.Listener<String> listener, Response.ErrorListener errorListener) {
         salt = "1Hf%5Yh&7Og$1Wh!6Vr&7Rs!3Nj#1Aa$";
         final LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("appid", "0008");
@@ -145,11 +137,11 @@ public class WifiMasterKey {
         return new KeyRequest(data, listener, errorListener);
     }
 
-    public static String getMD5(String input) {
+    private static String getMD5(String input) {
         return TextUtils.toHexString(getMD5(input.getBytes()));
     }
 
-    public static byte[] getMD5(byte[] input) {
+    private static byte[] getMD5(byte[] input) {
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             return md5.digest(input);
@@ -159,7 +151,7 @@ public class WifiMasterKey {
         return null;
     }
 
-    public static LinkedHashMap<String, Map<String, String>> parsingResponse(JSONObject jsonObject) {
+    static LinkedHashMap<String, Map<String, String>> parsingResponse(JSONObject jsonObject) {
         JSONObject psws = jsonObject.optJSONObject("qryapwd").optJSONObject("psws");
         LinkedHashMap<String, Map<String, String>> apList = new LinkedHashMap<>();
         Iterator it = psws.keys();
@@ -174,26 +166,26 @@ public class WifiMasterKey {
         return apList;
     }
 
-    public void setDhid(String dhid) {
+    void setDhid(String dhid) {
         this.dhid = dhid;
         isSigned = true;
     }
 
-    public void setSalt(String salt) {
+    void setSalt(String salt) {
         this.salt = salt;
     }
 
-    public boolean isSigned() {
+    boolean isSigned() {
         return isSigned;
     }
 
-    static class KeyRequest extends StringRequest {
+    private static class KeyRequest extends StringRequest {
 
         private Map<String, String> params;
         private static String URL = "http://wifiapi02.51y5.net/wifiapi/fa.cmd";
 
 
-        public KeyRequest(Map<String, String> params, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        KeyRequest(Map<String, String> params, Response.Listener<String> listener, Response.ErrorListener errorListener) {
             super(Request.Method.POST, URL, listener, errorListener);
             this.params = params;
         }
