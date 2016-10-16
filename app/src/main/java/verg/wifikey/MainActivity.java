@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
-                mFab.setEnabled(true);
+                mFab.setVisibility(View.VISIBLE);
                 mSrl.setRefreshing(false);
             }
         }));
